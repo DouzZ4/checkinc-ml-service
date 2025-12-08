@@ -2,6 +2,7 @@
 Configuration management using Pydantic Settings
 """
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import Optional
 import os
 
@@ -21,8 +22,17 @@ class Settings(BaseSettings):
     allowed_origins: list[str] = [
         "http://localhost:8080",
         "http://localhost:3000",
-        "https://checkinc.onrender.com"  # Tu dominio de producción
+        "*",  # Temporalmente permitir todo para evitar errores iniciales
     ]
+    
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_allowed_origins(cls, v):
+        if isinstance(v, str) and not v.strip().startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        return []
     
     # ML Model Settings
     model_path: str = "./models/glucose_model.pkl"
