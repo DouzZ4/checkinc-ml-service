@@ -58,6 +58,10 @@ class PredictionResponse(BaseModel):
     model_version: str
     generated_at: datetime
     message: Optional[str] = None
+    
+    model_config = {
+        "protected_namespaces": ()
+    }
 
 
 # ============== Risk Assessment Schemas ==============
@@ -128,3 +132,7 @@ class HealthResponse(BaseModel):
     database: str
     model_loaded: bool
     timestamp: datetime
+    
+    model_config = {
+        "protected_namespaces": ()
+    }
