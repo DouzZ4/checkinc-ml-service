@@ -3,6 +3,7 @@ CheckInc ML Service - FastAPI Main Application
 Microservicio de Machine Learning para predicción de niveles de glucosa
 """
 from fastapi import FastAPI, Depends
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -155,22 +156,29 @@ async def get_statistics(db: Session = Depends(get_db)):
 
 
 # Error handlers
+# Error handlers
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
-    return {
-        "error": "Not Found",
-        "message": "The requested resource was not found",
-        "path": str(request.url)
-    }
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Not Found",
+            "message": "The requested resource was not found",
+            "path": str(request.url)
+        }
+    )
 
 
 @app.exception_handler(500)
 async def internal_error_handler(request, exc):
     logger.error(f"Internal server error: {exc}")
-    return {
-        "error": "Internal Server Error",
-        "message": "An unexpected error occurred. Please try again later."
-    }
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred. Please try again later."
+        }
+    )
 
 
 if __name__ == "__main__":
