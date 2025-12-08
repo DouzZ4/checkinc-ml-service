@@ -1,7 +1,7 @@
 # Dockerfile optimizado para FastAPI en Fly.io
 FROM python:3.11-slim
 
-# Set working directory
+# Set working director
 WORKDIR /code
 
 # Install PostgreSQL development libraries (needed for psycopg2-binary)
