@@ -3,13 +3,14 @@ Configuration management using Pydantic Settings
 """
 from pydantic_settings import BaseSettings
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
     """Application settings with environment variable support"""
     
     # Database
-    database_url: str = "postgresql://user:password@localhost:5432/checkinc_ml"
+    database_url: str = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/checkinc_ml")
     
     # API Configuration
     api_v1_prefix: str = "/api/v1"
