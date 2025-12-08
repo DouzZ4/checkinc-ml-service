@@ -18,36 +18,38 @@ class Settings(BaseSettings):
     project_name: str = "CheckInc ML Service"
     version: str = "1.0.0"
     
-    # CORS Settings
-    allowed_origins: list[str] = [
-        "http://localhost:8080",
-        "http://localhost:3000",
-        "*",  # Temporalmente permitir todo para evitar errores iniciales
-    ]
+    # CORS Settings - Recibimos string crudo para evitar errores de JSON
+    allowed_origins_raw: str = "*"
+
+    @property
+    def allowed_origins(self) -> list[str]:
+        if self.allowed_origins_raw == "*":
+            return ["*"]
+        if self.allowed_origins_raw.startswith("["):
+            try:
+                import json
+                return json.loads(self.allowed_origins_raw)
+            except:
+                pass
+        return [url.strip() for url in self.allowed_origins_raw.split(",") if url.strip()]
     
-    @field_validator("allowed_origins", mode="before")
-    @classmethod
-    def parse_allowed_origins(cls, v):
-        if isinstance(v, str) and not v.strip().startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        return []
-    
-    # ML Model Settings
-    model_path: str = "./models/glucose_model.pkl"
-    min_training_samples: int = 30  # Mínimo de lecturas para entrenar modelo
-    prediction_horizon_hours: int = 24  # Máximo de horas a predecir
+    # ML Model Settings - Renombrado para evitar conflicto con Pydantic
+    ml_model_path: str = "./models/glucose_model.pkl"
+    min_training_samples: int = 30
+    prediction_horizon_hours: int = 24
     
     # Security
-    api_key: Optional[str] = None  # Opcional: para autenticación adicional
+    api_key: Optional[str] = None
     
     # Logging
     log_level: str = "INFO"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": False,
+        "extra": "ignore",
+        "protected_namespaces": ('settings_',) 
+    }
 
 
 # Singleton instance

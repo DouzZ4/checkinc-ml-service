@@ -20,14 +20,15 @@ class GlucosePredictor:
     Uses historical data to make predictions.
     """
     
-    def __init__(self, model_path: str = None):
-        self.model_path = model_path or settings.model_path
+    
+    def __init__(self, ml_model_path: str = None):
+        self.ml_model_path = ml_model_path or settings.ml_model_path
         self.model: Optional[RandomForestRegressor] = None
         self.scaler: Optional[StandardScaler] = None
         self.model_version = "1.0.0"
         
         # Try to load existing model
-        if os.path.exists(self.model_path):
+        if os.path.exists(self.ml_model_path):
             self.load_model()
         else:
             # Initialize new model
@@ -42,11 +43,11 @@ class GlucosePredictor:
     def load_model(self):
         """Load trained model from disk"""
         try:
-            data = joblib.load(self.model_path)
+            data = joblib.load(self.ml_model_path)
             self.model = data['model']
             self.scaler = data['scaler']
             self.model_version = data.get('version', '1.0.0')
-            print(f"✓ Model loaded from {self.model_path}")
+            print(f"✓ Model loaded from {self.ml_model_path}")
         except Exception as e:
             print(f"⚠ Could not load model: {e}")
             self.model = None
@@ -54,13 +55,13 @@ class GlucosePredictor:
     
     def save_model(self):
         """Save trained model to disk"""
-        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        os.makedirs(os.path.dirname(self.ml_model_path), exist_ok=True)
         joblib.dump({
             'model': self.model,
             'scaler': self.scaler,
             'version': self.model_version
-        }, self.model_path)
-        print(f"✓ Model saved to {self.model_path}")
+        }, self.ml_model_path)
+        print(f"✓ Model saved to {self.ml_model_path}")
     
     def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
