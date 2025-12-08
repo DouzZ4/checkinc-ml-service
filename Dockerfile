@@ -22,8 +22,5 @@ COPY ./app ./app
 # Create models directory
 RUN mkdir -p /code/models
 
-# Expose port
-EXPOSE 8080
-
-# Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Command to run the application using dynamic PORT
+CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"
