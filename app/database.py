@@ -7,9 +7,14 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 from .config import settings
 
-# Create SQLAlchemy engine
+# Convert postgresql:// to postgresql+psycopg:// for psycopg3
+database_url = settings.database_url
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+# Create SQLAlchemy engine with psycopg3 driver
 engine = create_engine(
-    settings.database_url,
+    database_url,
     pool_pre_ping=True,  # Verify connections before using
     pool_size=5,
     max_overflow=10
